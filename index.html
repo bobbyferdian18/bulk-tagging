@@ -3,492 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caruso – Bulk Tagging</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Caruso – Contacts Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', -apple-system, 'SF Pro Text', sans-serif;
-      background: #112c37;
-      color: #111;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ─── TOP BAR ─────────────────────────────────────── */
-    .topbar { background:#112c37; height:60px; display:flex; align-items:center; padding:0 24px 0 0; flex-shrink:0; }
-    .topbar-logo-area { width:220px; height:60px; background:#112c37; display:flex; align-items:center; padding:10px 10px 10px 16px; gap:12px; flex-shrink:0; }
-    .topbar-search { background:rgba(104,122,144,0.6); border-radius:6px; height:36px; width:380px; display:flex; align-items:center; gap:8px; padding:0 12px; cursor:pointer; }
-    .topbar-search svg { flex-shrink:0; opacity:0.8; }
-    .topbar-search span { font-size:14px; color:rgba(255,255,255,0.75); }
-    .topbar-btn { margin-left:10px; border:1px solid rgba(255,255,255,0.7); border-radius:6px; height:36px; padding:0 14px; display:flex; align-items:center; gap:6px; cursor:pointer; background:transparent; color:#fff; font-size:14px; font-weight:700; white-space:nowrap; }
-    .topbar-btn:hover { background:rgba(255,255,255,0.1); }
-    .topbar-spacer { flex:1; margin-left:10px; }
-    .topbar-account { display:flex; align-items:center; gap:16px; }
-    .topbar-tenant { border:1px solid rgba(255,255,255,0.7); border-radius:6px; height:36px; padding:0 14px; color:#fff; font-size:14px; font-weight:500; display:flex; align-items:center; }
-    .topbar-divider { width:1px; height:32px; background:rgba(255,255,255,0.3); }
-    .topbar-user { border-radius:50%; width:36px; height:36px; background:#7f6df1; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:500; font-size:13px; cursor:pointer; }
-
-    /* ─── MAIN LAYOUT ──────────────────────────────────── */
-    .layout { display:flex; flex:1; }
-    .sidebar { width:220px; background:#112c37; padding:20px 10px; overflow-y:auto; flex-shrink:0; }
-    .main-content { flex:1; background:#f9fafb; overflow-y:auto; }
-
-    /* ─── SIDEBAR NAV ──────────────────────────────────── */
-    .sidebar-section-label { font-size:11px; font-weight:600; text-transform:uppercase; color:rgba(255,255,255,0.45); padding:0 10px; margin-top:20px; margin-bottom:10px; }
-    .sidebar-section-label:first-child { margin-top:0; }
-    .nav-item { padding:8px 10px; font-size:13px; color:#fff; cursor:pointer; border-radius:6px; white-space:nowrap; }
-    .nav-item:hover { background:rgba(255,255,255,0.1); }
-    .nav-item.active { background:#7f6df1; }
-
-    /* ─── CONTENT PADDING ──────────────────────────────── */
-    .content-header { padding:24px 24px 20px 24px; }
-    .content-header h1 { font-size:24px; font-weight:700; color:#0a0a0a; margin-bottom:8px; }
-    .content-header p { font-size:14px; color:#8c95a6; }
-
-    /* ─── TABS ─────────────────────────────────────────– */
-    .tabs { display:flex; gap:0; border-bottom:1px solid #e6e8f0; padding:0 24px; background:#fff; }
-    .tab { padding:16px 12px; font-size:13px; color:#8c95a6; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; }
-    .tab.active { color:#7f6df1; border-bottom-color:#7f6df1; }
-    .tab:hover { color:#0a0a0a; }
-
-    /* ─── FILTERS + BUTTONS ────────────────────────────── */
-    .toolbar { display:flex; gap:12px; padding:20px 24px; background:#fff; border-bottom:1px solid #e6e8f0; flex-wrap:wrap; align-items:center; }
-    .toolbar-label { font-size:13px; color:#8c95a6; font-weight:500; }
-    .filter-btn { background:#fff; border:1px solid #d8dae5; border-radius:8px; padding:0 12px; height:36px; font-size:13px; color:#0a0a0a; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; }
-    .filter-btn:hover { background:#f9fafb; }
-    .filter-btn.active { background:#e8e8ff; color:#7f6df1; border-color:#7f6df1; }
-    .btn-primary { background:#7f6df1; border:none; color:#fff; font-weight:700; border-radius:6px; padding:0 16px; height:36px; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; }
-    .btn-primary:hover { background:#6f5dd1; }
-    .btn-secondary { background:#fff; border:1px solid #d8dae5; border-radius:6px; padding:0 16px; height:36px; color:#0a0a0a; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; }
-    .btn-secondary:hover { background:#f9fafb; }
-
-    /* ─── TABLE ────────────────────────────────────────– */
-    .table-container { background:#fff; margin:0 24px 24px 24px; border-radius:4px; border:1px solid #e6e8f0; overflow:hidden; }
-    table { width:100%; border-collapse:collapse; }
-    thead { background:#f9fafb; }
-    th { padding:12px 16px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; color:#8c95a6; letter-spacing:0.5px; }
-    td { padding:16px; border-top:1px solid #f0f2f5; font-size:13px; color:#0a0a0a; }
-    tr:last-child td { border-top:1px solid #e6e8f0; }
-
-    /* ─── CONTACT NAME COLUMN ─────────────────────────– */
-    .contact-name { font-weight:500; }
-    .contact-email { font-size:12px; color:#8c95a6; }
-
-    /* ─── TAGS IN TABLE ────────────────────────────────– */
-    .tag-list { display:flex; gap:6px; flex-wrap:wrap; }
-    .tag { display:inline-block; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:600; white-space:nowrap; }
-    .tag.prospect { background:#fef3e8; color:#c07514; }
-    .tag.investor { background:#e3f0fb; color:#1a6ea8; }
-    .tag.adviser { background:#e7f5ee; color:#2e7d57; }
-    .tag.key-contact { background:#ede9fd; color:#7f6df1; }
-
-    /* ─── MODAL / SIDE SHEET ───────────────────────────– */
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; }
-    .modal-overlay.active { display:flex; align-items:center; justify-content:center; }
-    .modal { background:#fff; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 40px rgba(0,0,0,0.2); }
-    .modal-header { padding:24px; border-bottom:1px solid #e6e8f0; }
-    .modal-header h2 { font-size:16px; font-weight:700; color:#0a0a0a; }
-    .modal-body { padding:24px; overflow-y:auto; flex:1; }
-    .modal-footer { padding:16px 24px; border-top:1px solid #e6e8f0; display:flex; gap:12px; justify-content:flex-end; }
-    .form-group { margin-bottom:20px; }
-    .form-label { display:block; font-size:12px; font-weight:600; color:#0a0a0a; margin-bottom:6px; text-transform:uppercase; }
-    .form-input { width:100%; padding:10px 12px; border:1px solid #d8dae5; border-radius:6px; font-size:13px; }
-    .form-input:focus { outline:none; border-color:#7f6df1; box-shadow:0 0 0 3px rgba(127,109,241,0.1); }
-    .tag-input-wrapper { display:flex; flex-wrap:wrap; gap:6px; padding:8px; border:1px solid #d8dae5; border-radius:6px; }
-    .tag-input { border:none; font-size:13px; flex:1; min-width:100px; outline:none; }
-    .tag-input:focus { outline:none; }
-
-    /* ─── BADGE ───────────────────────────────────────– */
-    .badge { display:inline-block; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:600; background:#d6e0ff; color:#2952cc; }
-
-    /* ─── EMPTY STATE ──────────────────────────────────– */
-    .empty-state { text-align:center; padding:60px 24px; color:#8c95a6; }
-    .empty-state h3 { font-size:16px; font-weight:600; color:#0a0a0a; margin-bottom:8px; }
-    .empty-state p { font-size:13px; }
-
-    /* ─── CHECKBOX ─────────────────────────────────────– */
-    input[type="checkbox"] { width:18px; height:18px; cursor:pointer; accent-color:#7f6df1; }
-
-    /* ─── LOADING SPINNER ──────────────────────────────– */
-    .loading { text-align:center; padding:40px; }
-    .spinner { width:24px; height:24px; border:3px solid #e6e8f0; border-top-color:#7f6df1; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    /* ─── CONFIRMATION DIALOG ──────────────────────────– */
-    .confirm-dialog { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:100; }
-    .confirm-dialog.active { display:flex; }
-    .confirm-box { background:#fff; border-radius:8px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.2); }
-    .confirm-box h3 { font-size:16px; font-weight:700; color:#0a0a0a; margin-bottom:12px; }
-    .confirm-box p { font-size:13px; color:#8c95a6; margin-bottom:20px; }
-    .confirm-box-actions { display:flex; gap:12px; justify-content:flex-end; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; background: #f9fafb; color: #0a0a0a; min-height: 100vh; }
+    .topbar { background: #112c37; height: 60px; display: flex; align-items: center; padding: 0 24px; color: #fff; }
+    .topbar-logo { font-weight: 600; font-size: 14px; margin-right: auto; }
+    .sidebar { width: 220px; background: #112c37; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
+    .main { margin-left: 220px; display: flex; flex-direction: column; min-height: 100vh; }
+    .content { padding: 24px; flex: 1; }
+    .header { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .subheader { font-size: 14px; color: #8c95a6; margin-bottom: 20px; }
+    .toolbar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+    .btn { background: #7f6df1; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+    .btn:hover { background: #6f5dd1; }
+    .btn-secondary { background: #fff; color: #0a0a0a; border: 1px solid #d8dae5; }
+    .btn-secondary:hover { background: #f9fafb; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e6e8f0; }
+    th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c95a6; }
+    td { padding: 16px; border-top: 1px solid #f0f2f5; }
+    .tag { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .tag.prospect { background: #fef3e8; color: #c07514; }
+    .tag.investor { background: #e3f0fb; color: #1a6ea8; }
+    .tag.adviser { background: #e7f5ee; color: #2e7d57; }
+    .tag.key-contact { background: #ede9fd; color: #7f6df1; }
   </style>
 </head>
 <body>
-  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-logo-area">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="8" height="8" fill="white" rx="1"/>
-        <rect x="14" y="2" width="8" height="8" fill="white" rx="1"/>
-        <rect x="2" y="14" width="8" height="8" fill="white" rx="1"/>
-        <rect x="14" y="14" width="8" height="8" fill="white" rx="1"/>
-      </svg>
-      <span style="color:#fff; font-size:13px; font-weight:600;">Caruso</span>
-    </div>
-    <div class="topbar-search">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="m21 21-4.35-4.35"></path>
-      </svg>
-      <span>Search contacts...</span>
-    </div>
-    <div class="topbar-spacer"></div>
-    <div class="topbar-account">
-      <div class="topbar-tenant">Caruso Demo</div>
-      <div class="topbar-divider"></div>
-      <div class="topbar-user">B</div>
-    </div>
+    <div class="topbar-logo">Caruso</div>
   </div>
-
-  <!-- MAIN LAYOUT -->
-  <div class="layout">
-    <!-- SIDEBAR -->
+  <div class="main">
     <div class="sidebar">
-      <div class="sidebar-section-label">Menu</div>
-      <div class="nav-item active">Contacts</div>
-      <div class="nav-item">Prospects</div>
-      <div class="nav-item">Investors</div>
-      <div class="nav-item">Advisers</div>
-      <div class="sidebar-section-label">Adviser CRM</div>
-      <div class="nav-item">Adviser Companies</div>
-      <div class="nav-item">Dealer Groups</div>
-      <div class="sidebar-section-label">Admin</div>
-      <div class="nav-item">Reports</div>
-      <div class="nav-item">Settings</div>
+      <div style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px;">Menu</div>
+      <div style="font-size: 13px; margin-bottom: 12px; cursor: pointer;">Contacts</div>
+      <div style="font-size: 13px; margin-bottom: 12px; cursor: pointer;">Settings</div>
     </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-      <!-- HEADER -->
-      <div class="content-header">
-        <h1>Bulk Tagging</h1>
-        <p>Bulk apply tags to multiple contacts at once.</p>
-      </div>
-
-      <!-- TABS -->
-      <div class="tabs">
-        <div class="tab active">Bulk Tag Contacts</div>
-        <div class="tab">History</div>
-      </div>
-
-      <!-- TOOLBAR -->
+    <div class="content">
+      <h1 class="header">Bulk Tagging</h1>
+      <p class="subheader">Bulk apply tags to multiple contacts</p>
       <div class="toolbar">
-        <span class="toolbar-label">Filter by:</span>
-        <button class="filter-btn active">Role: All</button>
-        <button class="filter-btn">Status: All</button>
-        <button class="filter-btn">Tags: All</button>
-        <div style="flex:1;"></div>
-        <button class="btn-secondary" onclick="openSelectColumnsModal()">Columns</button>
+        <button class="btn">+ Add Tag</button>
         <button class="btn-secondary">Export</button>
-        <button class="btn-primary" onclick="openBulkTagModal()">+ Add Tag</button>
       </div>
-
-      <!-- TABLE -->
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:32px;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"/></th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Current Tags</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- rows will be inserted here -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- EMPTY STATE (hidden initially) -->
-      <div class="empty-state" id="emptyState" style="display:none;">
-        <h3>No contacts yet</h3>
-        <p>Create your first contact to start tagging.</p>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alice Johnson</td>
+            <td>alice@example.com</td>
+            <td><span class="tag investor">Investor</span></td>
+          </tr>
+          <tr>
+            <td>Bob Smith</td>
+            <td>bob@example.com</td>
+            <td><span class="tag prospect">Prospect</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-
-  <!-- BULK TAG MODAL -->
-  <div class="modal-overlay" id="bulkTagModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Add Tags to Selected Contacts</h2>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Select tags to add</label>
-          <div class="tag-input-wrapper" id="selectedTagsWrapper"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Available tags</label>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px;">
-            <div class="tag prospect" onclick="selectTag(this)">Prospect</div>
-            <div class="tag investor" onclick="selectTag(this)">Investor</div>
-            <div class="tag adviser" onclick="selectTag(this)">Adviser</div>
-            <div class="tag key-contact" onclick="selectTag(this)">Key Contact</div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Or enter custom tag</label>
-          <input type="text" class="form-input" id="customTagInput" placeholder="Enter tag name..." />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeBulkTagModal()">Cancel</button>
-        <button class="btn-primary" onclick="applyTags()">Apply Tags</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SELECT COLUMNS MODAL -->
-  <div class="modal-overlay" id="columnsModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Select Columns</h2>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleColumn('name')"/> Name
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleColumn('email')"/> Email
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleColumn('tags')"/> Current Tags
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleColumn('status')"/> Status
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" onchange="toggleColumn('phone')"/> Phone
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
-            <input type="checkbox" onchange="toggleColumn('company')"/> Company
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeColumnsModal()">Done</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONFIRMATION DIALOG -->
-  <div class="confirm-dialog" id="confirmDialog">
-    <div class="confirm-box">
-      <h3 id="confirmTitle">Confirm Action</h3>
-      <p id="confirmMessage">Are you sure?</p>
-      <div class="confirm-box-actions">
-        <button class="btn-secondary" onclick="closeConfirm()">Cancel</button>
-        <button class="btn-primary" onclick="confirmAction()">Confirm</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-// ─── DATA ────────────────────────────────────────────
-const mockContacts = [
-  { id: 1, name: 'Alice Johnson', email: 'alice@example.com', tags: ['Investor'], status: 'Active', phone: '+1-555-0101', company: 'Tech Corp' },
-  { id: 2, name: 'Bob Smith', email: 'bob@example.com', tags: ['Prospect'], status: 'Active', phone: '+1-555-0102', company: 'Finance Inc' },
-  { id: 3, name: 'Carol Davis', email: 'carol@example.com', tags: ['Adviser'], status: 'Active', phone: '+1-555-0103', company: 'Advisory Ltd' },
-  { id: 4, name: 'David Brown', email: 'david@example.com', tags: ['Key Contact', 'Investor'], status: 'Inactive', phone: '+1-555-0104', company: 'Investment Partners' },
-  { id: 5, name: 'Eva Wilson', email: 'eva@example.com', tags: ['Prospect', 'Adviser'], status: 'Active', phone: '+1-555-0105', company: 'Global Advisers' },
-  { id: 6, name: 'Frank Miller', email: 'frank@example.com', tags: ['Investor'], status: 'Active', phone: '+1-555-0106', company: 'Funds Management' },
-  { id: 7, name: 'Grace Lee', email: 'grace@example.com', tags: [], status: 'Active', phone: '+1-555-0107', company: 'Wealth Advisers' },
-  { id: 8, name: 'Henry Taylor', email: 'henry@example.com', tags: ['Key Contact'], status: 'Active', phone: '+1-555-0108', company: 'Investment Team' },
-  { id: 9, name: 'Ivy Chen', email: 'ivy@example.com', tags: ['Prospect'], status: 'Inactive', phone: '+1-555-0109', company: 'Finance Solutions' },
-  { id: 10, name: 'Jack Robinson', email: 'jack@example.com', tags: ['Adviser', 'Key Contact'], status: 'Active', phone: '+1-555-0110', company: 'Advisory Services' },
-  { id: 11, name: 'Karen White', email: 'karen@example.com', tags: ['Investor'], status: 'Active', phone: '+1-555-0111', company: 'Capital Management' },
-  { id: 12, name: 'Leo Harris', email: 'leo@example.com', tags: [], status: 'Active', phone: '+1-555-0112', company: 'Wealth Partners' },
-];
-
-// ─── STATE ────────────────────────────────────────────
-let selectedRows = new Set();
-let visibleColumns = { name: true, email: true, tags: true, status: true, phone: false, company: false };
-let selectedTags = [];
-let contactsToTag = [];
-
-// ─── RENDER ───────────────────────────────────────────
-function renderTable() {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-
-  mockContacts.forEach(contact => {
-    const row = document.createElement('tr');
-    const isSelected = selectedRows.has(contact.id);
-
-    let html = `<td style="width:32px;"><input type="checkbox" onchange="toggleRow(${contact.id})" ${isSelected ? 'checked' : ''}/></td>`;
-
-    if (visibleColumns.name) {
-      html += `<td><div class="contact-name">${contact.name}</div><div class="contact-email">${contact.email}</div></td>`;
-    }
-    if (visibleColumns.email) {
-      html += `<td>${contact.email}</td>`;
-    }
-    if (visibleColumns.tags) {
-      html += `<td><div class="tag-list">${contact.tags.map(t => `<span class="tag ${t.toLowerCase().replace(' ', '-')}">${t}</span>`).join('')}</div></td>`;
-    }
-    if (visibleColumns.status) {
-      html += `<td><span class="badge">${contact.status}</span></td>`;
-    }
-    if (visibleColumns.phone) {
-      html += `<td>${contact.phone}</td>`;
-    }
-    if (visibleColumns.company) {
-      html += `<td>${contact.company}</td>`;
-    }
-
-    row.innerHTML = html;
-    tbody.appendChild(row);
-  });
-
-  updateSelectAllCheckbox();
-}
-
-function updateSelectAllCheckbox() {
-  const checkbox = document.getElementById('selectAllCheckbox');
-  checkbox.indeterminate = selectedRows.size > 0 && selectedRows.size < mockContacts.length;
-  checkbox.checked = selectedRows.size === mockContacts.length;
-}
-
-// ─── SELECTION ────────────────────────────────────────
-function toggleRow(id) {
-  if (selectedRows.has(id)) {
-    selectedRows.delete(id);
-  } else {
-    selectedRows.add(id);
-  }
-  renderTable();
-}
-
-function toggleSelectAll() {
-  const checkbox = document.getElementById('selectAllCheckbox');
-  if (checkbox.checked) {
-    mockContacts.forEach(c => selectedRows.add(c.id));
-  } else {
-    selectedRows.clear();
-  }
-  renderTable();
-}
-
-// ─── BULK TAG MODAL ────────────────────────────────────
-function openBulkTagModal() {
-  if (selectedRows.size === 0) {
-    showConfirm('No contacts selected', 'Please select at least one contact to tag.', () => {});
-    return;
-  }
-  contactsToTag = mockContacts.filter(c => selectedRows.has(c.id));
-  selectedTags = [];
-  document.getElementById('customTagInput').value = '';
-  document.getElementById('selectedTagsWrapper').innerHTML = '';
-  document.getElementById('bulkTagModal').classList.add('active');
-}
-
-function closeBulkTagModal() {
-  document.getElementById('bulkTagModal').classList.remove('active');
-}
-
-function selectTag(el) {
-  const tagName = el.textContent.trim();
-  if (!selectedTags.includes(tagName)) {
-    selectedTags.push(tagName);
-    renderSelectedTags();
-  }
-}
-
-function renderSelectedTags() {
-  const wrapper = document.getElementById('selectedTagsWrapper');
-  wrapper.innerHTML = selectedTags.map(tag => `<div class="tag" style="cursor:pointer;" onclick="removeTag('${tag}')">${tag} ×</div>`).join('');
-}
-
-function removeTag(tagName) {
-  selectedTags = selectedTags.filter(t => t !== tagName);
-  renderSelectedTags();
-}
-
-function applyTags() {
-  const customTag = document.getElementById('customTagInput').value.trim();
-  if (customTag && !selectedTags.includes(customTag)) {
-    selectedTags.push(customTag);
-  }
-
-  if (selectedTags.length === 0) {
-    showConfirm('No tags selected', 'Please select or create at least one tag.', () => {});
-    return;
-  }
-
-  const tagList = selectedTags.join(', ');
-  showConfirm(
-    'Apply tags?',
-    `Add ${selectedTags.length} tag(s) to ${contactsToTag.length} contact(s)?\n\nTags: ${tagList}`,
-    () => {
-      contactsToTag.forEach(contact => {
-        selectedTags.forEach(tag => {
-          if (!contact.tags.includes(tag)) {
-            contact.tags.push(tag);
-          }
-        });
-      });
-      selectedRows.clear();
-      selectedTags = [];
-      renderTable();
-      closeBulkTagModal();
-    }
-  );
-}
-
-// ─── COLUMNS MODAL ─────────────────────────────────────
-function openSelectColumnsModal() {
-  document.getElementById('columnsModal').classList.add('active');
-}
-
-function closeColumnsModal() {
-  document.getElementById('columnsModal').classList.remove('active');
-}
-
-function toggleColumn(col) {
-  visibleColumns[col] = !visibleColumns[col];
-  renderTable();
-}
-
-// ─── CONFIRMATION DIALOG ──────────────────────────────
-let confirmCallback = null;
-
-function showConfirm(title, message, callback) {
-  confirmCallback = callback;
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmMessage').textContent = message;
-  document.getElementById('confirmDialog').classList.add('active');
-}
-
-function closeConfirm() {
-  document.getElementById('confirmDialog').classList.remove('active');
-  confirmCallback = null;
-}
-
-function confirmAction() {
-  if (confirmCallback) {
-    confirmCallback();
-  }
-  closeConfirm();
-}
-
-// ─── INIT ──────────────────────────────────────────
-renderAll();
-</script>
 </body>
 </html>
