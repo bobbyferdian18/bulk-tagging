@@ -3,72 +3,1099 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caruso – Contacts Prototype</title>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Caruso – Bulk Tagging</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; background: #f9fafb; color: #0a0a0a; min-height: 100vh; }
-    .topbar { background: #112c37; height: 60px; display: flex; align-items: center; padding: 0 24px; color: #fff; }
-    .topbar-logo { font-weight: 600; font-size: 14px; margin-right: auto; }
-    .sidebar { width: 220px; background: #112c37; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; }
-    .main { margin-left: 220px; display: flex; flex-direction: column; min-height: 100vh; }
-    .content { padding: 24px; flex: 1; }
-    .header { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-    .subheader { font-size: 14px; color: #8c95a6; margin-bottom: 20px; }
-    .toolbar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
-    .btn { background: #7f6df1; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
-    .btn:hover { background: #6f5dd1; }
-    .btn-secondary { background: #fff; color: #0a0a0a; border: 1px solid #d8dae5; }
-    .btn-secondary:hover { background: #f9fafb; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e6e8f0; }
-    th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c95a6; }
-    td { padding: 16px; border-top: 1px solid #f0f2f5; }
-    .tag { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-    .tag.prospect { background: #fef3e8; color: #c07514; }
-    .tag.investor { background: #e3f0fb; color: #1a6ea8; }
-    .tag.adviser { background: #e7f5ee; color: #2e7d57; }
-    .tag.key-contact { background: #ede9fd; color: #7f6df1; }
+    body {
+      font-family: 'Inter', -apple-system, 'SF Pro Text', sans-serif;
+      background: #112c37;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── TOP BAR ─────────────────────────────────────── */
+    .topbar { background:#112c37; height:60px; display:flex; align-items:center; padding:0 24px 0 0; flex-shrink:0; }
+    .topbar-logo-area { width:220px; height:60px; background:#112c37; display:flex; align-items:center; padding:10px 10px 10px 16px; gap:12px; flex-shrink:0; }
+    .topbar-search { background:rgba(104,122,144,0.6); border-radius:6px; height:36px; width:380px; display:flex; align-items:center; gap:8px; padding:0 12px; cursor:pointer; }
+    .topbar-search svg { flex-shrink:0; opacity:0.8; }
+    .topbar-search span { font-size:14px; color:rgba(255,255,255,0.75); }
+    .topbar-btn { margin-left:10px; border:1px solid rgba(255,255,255,0.7); border-radius:6px; height:36px; padding:0 14px; display:flex; align-items:center; gap:6px; cursor:pointer; background:transparent; color:#fff; font-size:14px; font-weight:700; white-space:nowrap; }
+    .topbar-btn:hover { background:rgba(255,255,255,0.1); }
+    .topbar-spacer { flex:1; margin-left:10px; }
+    .topbar-account { display:flex; align-items:center; gap:16px; }
+    .topbar-tenant { border:1px solid rgba(255,255,255,0.7); border-radius:6px; height:36px; padding:0 14px; color:#fff; font-size:14px; font-weight:500; display:flex; align-items:center; }
+    .topbar-divider { width:1px; height:32px; background:rgba(255,255,255,0.3); }
+    .avatar { width:36px; height:36px; border-radius:50%; background:#dcf2ea; color:#317159; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; }
+
+    /* ─── LAYOUT ──────────────────────────────────────── */
+    .layout { display:flex; flex:1; min-height:0; }
+    .sidebar { width:220px; background:#112c37; flex-shrink:0; padding:12px 10px; display:flex; flex-direction:column; overflow-y:auto; min-height:calc(100vh - 60px); }
+    .nav-section-label { display:flex; align-items:center; gap:5px; height:36px; padding:0 10px; margin-top:6px; }
+    .nav-section-label span { font-size:11px; font-weight:600; color:#d2cbff; text-transform:uppercase; letter-spacing:0.5px; }
+    .nav-item { display:flex; align-items:center; height:36px; padding:0 10px; border-radius:5px; cursor:pointer; font-size:14px; font-weight:500; color:rgba(255,255,255,0.85); white-space:nowrap; position:relative; transition:background 0.15s; }
+    .nav-item:hover { background:rgba(255,255,255,0.08); }
+    .nav-item.active { background:#7f6df1; color:#fff; }
+    .nav-badge { position:absolute; right:10px; background:#dcf2ea; color:#317159; font-size:11px; font-weight:600; border-radius:8px; padding:1px 6px; }
+
+    /* ─── MAIN ────────────────────────────────────────── */
+    .main { flex:1; background:#fff; display:flex; flex-direction:column; min-width:0; border-radius:4px 0 0 0; overflow:hidden; position:relative; }
+    .page-header { height:46px; border-bottom:1px solid #e6e8f0; display:flex; align-items:center; padding:0 24px; }
+    .breadcrumb { font-size:13px; color:#425a70; display:flex; align-items:center; gap:6px; }
+    .breadcrumb .current { font-weight:600; color:#7f6df1; }
+    .toolbar { height:56px; border-bottom:1px solid #e6e8f0; display:flex; align-items:center; padding:0 24px; gap:12px; }
+    .search-box { border:1px solid #e0e4ea; border-radius:6px; height:34px; width:220px; display:flex; align-items:center; gap:8px; padding:0 10px; background:#fafafa; }
+    .search-box input { border:none; background:transparent; font-size:13px; color:#425a70; outline:none; width:100%; font-family:inherit; }
+    .search-box input::placeholder { color:#aab2bd; }
+    .filter-btn { border:1px solid #d8dae5; border-radius:8px; height:36px; padding:0 16px; font-size:13px; color:#474d66; background:#fff; cursor:pointer; font-family:inherit; }
+    .filter-btn:hover { background:#f8f9fb; }
+    .toolbar-spacer { flex:1; }
+    .create-btn { background:#7f6df1; color:#fff; border:none; border-radius:6px; height:34px; padding:0 14px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; font-family:inherit; }
+
+    /* ─── TABLE ───────────────────────────────────────── */
+    .table-wrap { flex:1; overflow:auto; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { text-align:left; padding:10px 16px; font-size:11px; font-weight:600; color:#8c95a6; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; position:sticky; top:0; background:#f9fafb; z-index:1; border-bottom:1px solid #e6e8f0; }
+    tbody tr { border-bottom:1px solid #f0f2f5; cursor:pointer; transition:background 0.08s; }
+    tbody tr:hover { background:#f8f9fb; }
+    tbody td { padding:11px 16px; color:#0a0a0a; font-size:13px; white-space:nowrap; vertical-align:middle; }
+    .col-check { width:40px; text-align:center; }
+    .col-check input[type="checkbox"] { width:16px; height:16px; accent-color:#7f6df1; cursor:pointer; }
+    thead th.col-check { position:sticky; left:0; z-index:3; }
+    tbody td.col-check { position:sticky; left:0; z-index:1; background:#fff; }
+    tbody tr:hover td.col-check { background:#f8f9fb; }
+    tbody tr.selected td { background:#f5f3ff; }
+    tbody tr.selected td.col-check { background:#f5f3ff; }
+    .col-id { width:70px; }
+    .badge { display:inline-flex; align-items:center; height:24px; border-radius:4px; font-size:11px; font-weight:600; padding:0 8px; letter-spacing:0.3px; text-transform:uppercase; }
+    .badge-account { background:#e3f0fb; color:#1a6ea8; }
+    .badge-prospect { background:#fef3e8; color:#c07514; }
+    .badge-individual { background:#e3f0fb; color:#1a6ea8; }
+    .badge-company { background:#e7f5ee; color:#2e7d57; }
+    .badge-trust { background:#fef3e8; color:#c07514; }
+    .badge-partnership { background:#fdf2f2; color:#c0392b; }
+    .badge-joint { background:#ede9fd; color:#7f6df1; }
+    .tasks-btn { display:inline-flex; align-items:center; gap:8px; height:28px; padding:0 10px; background:#fff; border:1px solid #d8dae5; border-radius:4px; font-size:12px; font-weight:500; color:#0a0a0a; cursor:pointer; font-family:inherit; }
+    .tasks-btn .task-count { background:#d6e0ff; color:#2952cc; font-size:11px; font-weight:600; border-radius:8px; padding:1px 6px; }
+    .add-cell { width:48px; text-align:center; position:sticky; right:0; background:#fff; z-index:1; }
+    .add-cell::before, thead th:last-child::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:#e6e8f0; }
+    thead th:last-child { position:sticky; right:0; background:#f9fafb; z-index:2; }
+    .add-btn { width:32px; height:32px; border-radius:6px; border:1px solid #e0e4ea; background:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+    .add-btn:hover { background:#f0f2f5; }
+    .pagination { height:60px; border-top:1px solid #e6e8f0; display:flex; align-items:center; padding:0 24px; gap:12px; flex-shrink:0; }
+    .pagination .results-label { font-size:12px; color:#425a70; }
+
+    /* ─── TAG BADGES (Option F style) ─────────────────── */
+    .tag-wrap { display:flex; flex-wrap:nowrap; gap:5px; align-items:center; }
+    .tag { display:inline-flex; align-items:center; height:24px; border-radius:4px; font-size:11px; font-weight:600; padding:0 8px; white-space:nowrap; text-transform:uppercase; }
+    .tag-counter { display:inline-flex; align-items:center; justify-content:center; height:24px; min-width:28px; border-radius:4px; font-size:11px; font-weight:600; padding:0 6px; background:#eef0f3; color:#4b5563; cursor:pointer; white-space:nowrap; user-select:none; }
+    .tag-counter:hover { background:#e2e5ea; }
+
+    /* Tag popover (on +N click) */
+    .tag-popover-inline { position:absolute; z-index:80; background:#fff; border:1px solid #e6e8f0; border-radius:8px; padding:8px; box-shadow:0 8px 24px rgba(0,0,0,0.14); display:flex; flex-wrap:wrap; gap:5px; max-width:300px; }
+
+    /* ─── STICKY ACTION BAR ──────────────────────────── */
+    .action-bar {
+      position: absolute;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #112c37;
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 50;
+      box-shadow: 0 4px 7px rgba(15,23,42,0.2);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .action-bar.hidden { opacity:0; pointer-events:none; transform:translateX(-50%) translateY(12px); }
+    .action-bar-count { color:#fff; font-size:12px; font-weight:600; white-space:nowrap; }
+    .action-bar-divider { width:1px; height:32px; background:rgba(255,255,255,0.2); }
+    .action-bar-btn { background:transparent; border:1px solid #fff; border-radius:4px; height:32px; padding:0 16px; color:#fff; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; font-family:inherit; white-space:nowrap; }
+    .action-bar-btn:hover { background:rgba(255,255,255,0.1); }
+    .action-bar-btn.primary { background:#7f6df1; border-color:#7f6df1; }
+    .action-bar-btn.primary:hover { background:#6c5be0; }
+
+    /* ─── ACTIONS DROPDOWN (pops UP) ────────────────── */
+    .actions-dropdown-anchor { position:relative; display:inline-block; }
+    .actions-dropdown {
+      position:absolute; bottom:calc(100% + 8px); left:0;
+      width:240px; background:#fff; border:1px solid #e6e8f0; border-radius:8px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.06);
+      overflow:hidden; z-index:60;
+    }
+    .actions-dropdown-item {
+      display:flex; align-items:center; gap:10px; height:40px; padding:0 14px;
+      cursor:pointer; font-size:13px; color:#0a0a0a; transition:background 0.08s;
+    }
+    .actions-dropdown-item:hover { background:#f5f3ff; }
+    .actions-dropdown-item:not(:last-child) { border-bottom:1px solid #f0f2f5; }
+    .actions-dropdown-item svg { flex-shrink:0; }
+
+    /* ─── TAG PICKER (compact multi-select) ────────── */
+    .tag-picker-backdrop { position:fixed; inset:0; z-index:90; }
+    .tag-picker-anchor {
+      position:absolute; bottom:118px; left:50%; transform:translateX(-50%); z-index:100;
+    }
+    .tag-picker {
+      width:300px; background:#fff; border:1px solid #e6e8f0; border-radius:10px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .tp-header { display:flex; align-items:center; height:40px; padding:0 12px; gap:8px; border-bottom:1px solid #e6e8f0; background:#fafbfc; }
+    .tp-header-title { font-size:13px; font-weight:600; color:#0a0a0a; flex:1; }
+    .tp-header-count { font-size:11px; font-weight:500; padding:2px 8px; border-radius:4px; background:#ede9fd; color:#7f6df1; }
+    .tp-search { display:flex; align-items:center; gap:8px; padding:8px 12px; border-bottom:1px solid #f0f2f5; }
+    .tp-search input { border:none; background:transparent; font-size:13px; color:#0a0a0a; outline:none; width:100%; font-family:inherit; direction:ltr; text-align:left; }
+    .tp-search input::placeholder { color:#aab2bd; }
+    .tp-list { max-height:280px; overflow-y:auto; padding:4px 0; }
+    .tp-item { display:flex; align-items:center; height:34px; padding:0 12px; gap:10px; cursor:pointer; transition:background 0.08s; user-select:none; }
+    .tp-item:hover { background:#f5f3ff; }
+    .tp-check { width:16px; height:16px; border-radius:3px; border:1.5px solid #d8dae5; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.1s; }
+    .tp-check.on { background:#7f6df1; border-color:#7f6df1; }
+    .tp-check.on::after { content:''; width:8px; height:5px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg); margin-top:-2px; }
+    .tp-check.mixed { background:#fff; border-color:#7f6df1; }
+    .tp-check.mixed::after { content:''; width:8px; height:0; border-bottom:2px solid #7f6df1; }
+    .tp-tag-badge { display:inline-flex; align-items:center; height:22px; border-radius:4px; font-size:11px; font-weight:600; padding:0 8px; text-transform:uppercase; white-space:nowrap; }
+
+    /* Create tag */
+    .tp-create { display:flex; align-items:center; height:34px; padding:0 12px; gap:8px; cursor:pointer; color:#7f6df1; font-size:13px; font-weight:500; border-top:1px solid #f0f2f5; }
+    .tp-create:hover { background:#f5f3ff; }
+    .tp-create-icon { font-size:14px; font-weight:700; color:#7f6df1; }
+
+    /* Colour selection screen (Step 2) */
+    .tp-colour-screen { display:flex; flex-direction:column; }
+    .tp-colour-header { display:flex; align-items:center; gap:8px; height:40px; padding:0 12px; border-bottom:1px solid #e6e8f0; background:#fafbfc; }
+    .tp-colour-back { background:none; border:none; cursor:pointer; font-size:16px; color:#474d66; padding:0; display:flex; align-items:center; }
+    .tp-colour-back:hover { color:#0a0a0a; }
+    .tp-colour-title { font-size:13px; font-weight:600; color:#0a0a0a; }
+    .tp-colour-subtitle { font-size:12px; color:#8c95a6; padding:10px 12px 6px; }
+    .tp-colour-list { padding:0 4px 4px; }
+    .tp-colour-item { display:flex; align-items:center; height:36px; padding:0 12px; gap:10px; cursor:pointer; border-radius:6px; transition:background 0.08s; }
+    .tp-colour-item:hover { background:#f5f3ff; }
+    .tp-created-label { font-size:12px; color:#8c95a6; font-weight:400; margin-left:auto; }
+
+    /* Detail page */
+    .detail-header { padding:24px 24px 0; }
+    .detail-identity { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .detail-avatar { width:40px; height:40px; border-radius:50%; background:#ede9fd; color:#7f6df1; font-size:14px; font-weight:600; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .detail-name { font-size:16px; font-weight:600; color:#0a0a0a; }
+    .detail-id { font-size:12px; color:#8c95a6; }
+    .detail-actions { display:flex; gap:8px; margin-left:auto; }
+    .detail-action-btn { height:32px; padding:0 14px; border:1px solid #d8dae5; border-radius:6px; background:#fff; font-size:13px; color:#0a0a0a; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; }
+    .detail-action-btn:hover { background:#f8f9fb; }
+    .detail-action-btn.plus { background:#7f6df1; color:#fff; border:none; width:32px; height:32px; padding:0; justify-content:center; border-radius:50%; font-size:18px; font-weight:300; }
+    .detail-fields { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:0 32px; padding:0 0 16px; border-bottom:1px solid #e6e8f0; }
+    .detail-field { padding:8px 0; }
+    .detail-field-label { font-size:11px; font-weight:600; color:#8c95a6; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .detail-field-value { font-size:13px; color:#0a0a0a; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .detail-field-value a { color:#7f6df1; text-decoration:none; }
+    .detail-field-value .add-tag-link { color:#8c95a6; cursor:pointer; font-size:13px; }
+    .detail-field-value .add-tag-link:hover { color:#7f6df1; }
+    .detail-tabs { display:flex; gap:0; border-bottom:1px solid #e6e8f0; padding:0 24px; }
+    .detail-tab { height:40px; padding:0 16px; font-size:13px; color:#8c95a6; display:flex; align-items:center; cursor:pointer; border-bottom:2px solid transparent; font-weight:500; }
+    .detail-tab:hover { color:#0a0a0a; }
+    .detail-tab.active { color:#7f6df1; border-bottom-color:#7f6df1; font-weight:600; }
+    .detail-body { padding:24px; flex:1; overflow:auto; }
+    .detail-section-title { font-size:14px; font-weight:600; color:#0a0a0a; margin-bottom:16px; }
+    .detail-form-row { display:flex; gap:24px; margin-bottom:16px; }
+    .detail-form-group { flex:1; }
+    .detail-form-label { font-size:12px; font-weight:500; color:#8c95a6; margin-bottom:6px; }
+    .detail-form-input { width:100%; height:36px; border:1px solid #d8dae5; border-radius:6px; padding:0 12px; font-size:13px; font-family:inherit; color:#0a0a0a; background:#fff; }
+    .detail-form-select { width:100%; height:36px; border:1px solid #d8dae5; border-radius:6px; padding:0 12px; font-size:13px; font-family:inherit; color:#8c95a6; background:#fff; appearance:auto; }
+    .detail-save-btn { background:#7f6df1; color:#fff; border:none; border-radius:6px; height:32px; padding:0 16px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; opacity:0.5; }
+    .portal-badge { display:inline-flex; align-items:center; height:22px; border-radius:4px; font-size:11px; font-weight:600; padding:0 8px; background:#fde8e8; color:#b91c1c; }
+    /* Detail page tag picker positioning */
+    .detail-tag-picker-wrap { position:relative; display:inline-block; }
+    .detail-tag-picker-anchor { position:absolute; top:100%; left:0; margin-top:4px; z-index:100; }
+
+    /* No confirmation needed — checkbox state change is sufficient feedback */
+
+    /* page-switch indicator */
+    .page-switch-label {
+      position:fixed; bottom:16px; right:16px; background:#1e293b; color:#fff;
+      font-size:11px; padding:6px 12px; border-radius:6px; z-index:200;
+      opacity:0; transition:opacity 0.3s; pointer-events:none;
+    }
+    .page-switch-label.show { opacity:1; }
+
+    /* ─── UNDO TOAST ────────────────────────────────── */
+    .undo-toast {
+      position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-12px);
+      background:#e6f7ed; color:#1a7a42; font-size:13px; font-weight:500;
+      padding:12px 20px; border-radius:8px; z-index:200;
+      display:flex; align-items:center; gap:10px;
+      border:1px solid #b4e6c8;
+      opacity:0; pointer-events:none;
+      transition:opacity 0.25s, transform 0.25s;
+    }
+    .undo-toast.show { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+    .undo-toast-icon { width:20px; height:20px; border-radius:50%; background:#34a853; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .undo-toast-icon svg { width:12px; height:12px; }
+    .undo-toast-msg { white-space:nowrap; }
+    .undo-toast-btn { background:none; border:none; color:#1a7a42; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; padding:0; text-decoration:underline; text-underline-offset:2px; }
+    .undo-toast-btn:hover { color:#145f32; }
+
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#d0d5dd; border-radius:99px; }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-logo">Caruso</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo-area">
+    <svg width="120" height="28" viewBox="0 0 151 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5098 0.863125C16.465 -0.012644 17.8386 -0.243916 19.0254 0.270351L24.9375 2.8309C25.5363 3.10231 25.9316 3.70125 25.9316 4.36801V9.87289C25.9316 9.92366 25.9542 9.97498 26.0049 9.99203L29.9277 11.7039L29.9219 11.7157H29.9277C30.5268 11.9869 30.9228 12.5859 30.9229 13.2528V17.4579C30.9229 18.1587 30.6229 18.8258 30.1143 19.3006L15.0576 33.244C14.3455 33.9053 13.3053 34.0804 12.418 33.6961L5.98535 30.9041C5.38639 30.6328 4.99123 30.0339 4.99121 29.367V23.8563C4.99121 23.8054 4.96786 23.7541 4.91699 23.7371L0.995117 22.0252C0.395994 21.7539 0 21.1541 0 20.4871V15.8807C0.00011497 15.4174 0.19829 14.9657 0.542969 14.6493L15.5098 0.863125ZM95.8994 6.86605C96.1392 6.86618 96.327 7.04757 96.3271 7.29379V19.3582C96.3272 22.1535 98.098 23.9764 100.744 23.9764C103.39 23.9764 105.252 22.1146 105.252 19.1766V6.86605H108.969V6.87289C109.209 6.87306 109.396 7.05427 109.396 7.30062V27.5692H105.849C105.609 27.5692 105.421 27.3878 105.421 27.1414V25.0204C104.305 26.9142 102.23 27.9588 99.7002 27.9588C95.1405 27.9588 92.124 24.6437 92.124 19.7987V6.86605H95.8994ZM119.508 6.67172C123.231 6.67172 126.344 8.58482 127.551 11.8602L124.671 13.2284C124.457 13.3321 124.217 13.2419 124.101 13.0282C123.199 11.2899 121.46 10.2127 119.469 10.2127H119.463C117.582 10.2127 116.421 11.1534 116.421 12.5868C116.421 14.0201 117.738 14.6237 119.016 14.9998L122.329 15.9793C125.669 16.9716 127.551 19.0465 127.551 21.8612C127.551 25.4739 124.495 27.9588 119.994 27.9588C115.837 27.9587 112.477 25.7269 111.245 22.2635L114.145 20.8954C114.346 20.7918 114.585 20.8955 114.702 21.0965C115.824 23.2107 117.757 24.488 119.994 24.4881C121.985 24.4881 123.38 23.496 123.38 21.9588C123.38 20.4931 121.959 19.8573 120.682 19.5135L117.484 18.6053C113.956 17.587 112.264 15.5119 112.264 12.7684C112.264 9.11689 115.337 6.67183 119.508 6.67172ZM48.707 6.67172C52.832 6.67178 56.4058 9.00031 57.6641 12.3924L54.3369 13.9422C54.123 14.046 53.8767 13.9422 53.7793 13.7284V13.7157C52.8518 11.8348 50.9835 10.6151 48.707 10.6151V10.6024C45.2111 10.6024 42.6622 13.3909 42.6621 17.2694C42.6621 21.148 45.2111 23.9627 48.707 23.9627C51.1585 23.9627 53.0652 22.5687 53.9668 20.4286L57.3076 22.0243C57.5213 22.1282 57.6187 22.3875 57.5215 22.6014C56.1594 25.6756 52.7022 27.9324 48.707 27.9325C42.6622 27.9325 38.2326 23.3017 38.2324 17.244C38.2324 11.1861 42.6297 6.67172 48.707 6.67172ZM139.258 6.67758C145.186 6.67758 149.843 11.0818 149.843 17.2889C149.843 23.4958 145.14 27.9325 139.258 27.9325C133.375 27.9324 128.647 23.4179 128.646 17.2889C128.646 11.1597 133.297 6.67767 139.258 6.67758ZM68.3984 6.71664C73.1591 6.71664 76.5058 9.58339 76.5059 13.7537V27.1414C76.5056 27.3811 76.3178 27.5691 76.0781 27.5692H72.4912V24.9881C70.9605 26.7781 68.7292 27.783 65.9404 27.783C61.8478 27.783 59.1045 25.4997 59.1045 22.0037C59.1046 18.7609 61.2644 16.3868 65.9082 15.5955L72.3027 14.5516V13.7606C72.3027 11.7824 70.7005 10.3621 68.2812 10.3621C66.2126 10.3623 64.5651 11.4513 63.709 13.0985C63.5988 13.2995 63.3527 13.3968 63.1387 13.2996L60.0381 11.7371C61.1991 8.79901 64.5721 6.70395 68.4053 6.70395L68.3984 6.71664ZM89.9844 6.89145C90.2241 6.89168 90.4121 7.07385 90.4121 7.32016V10.7186H87.7402C84.9513 10.7186 83.0889 12.5154 83.0889 15.6805V27.5692H79.1719C79.0163 27.5692 78.8869 27.4395 78.8867 27.284V6.93734H82.4727C82.7126 6.93734 82.9012 7.11873 82.9014 7.36508V9.73227C83.9262 7.70894 85.7881 6.89145 88.2461 6.89145H89.9844ZM23.626 10.3475C22.7951 9.98578 21.8339 10.1553 21.167 10.7713L7.46094 23.4666C7.35369 23.5628 7.37633 23.749 7.51758 23.8055L11.6885 25.6248C12.8754 26.1448 14.2489 25.9079 15.2041 25.0262L28.4531 12.7723L28.4473 12.7616C28.5547 12.6655 28.5319 12.4782 28.3906 12.4217L23.626 10.3475ZM66.7314 18.8065C64.5004 19.1762 63.502 20.2983 63.502 21.8289C63.502 23.3596 64.7992 24.4364 66.6152 24.4364C70.0072 24.4362 72.3095 22.0105 72.3096 18.9168V17.8338L66.7314 18.8065ZM139.258 10.6278C135.691 10.6279 133.07 13.4558 133.07 17.2889C133.07 21.1219 135.691 23.9822 139.258 23.9823C142.78 23.9823 145.445 21.1349 145.445 17.2889C145.445 13.4427 142.825 10.6278 139.258 10.6278ZM18.6289 1.47934C17.7983 1.11792 16.8377 1.28742 16.1709 1.90316L2.45898 14.6034C2.35159 14.6994 2.37432 14.8867 2.51562 14.9432V14.9315L6.68652 16.7518C7.87343 17.2717 9.24699 17.0339 10.2021 16.1522L23.4502 3.89828C23.5575 3.79661 23.5356 3.61021 23.3945 3.55355L18.6289 1.47934Z" fill="white"/></svg>
+    <button style="background:transparent;border:none;cursor:pointer;opacity:0.5;padding:4px;border-radius:5px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
   </div>
-  <div class="main">
-    <div class="sidebar">
-      <div style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px;">Menu</div>
-      <div style="font-size: 13px; margin-bottom: 12px; cursor: pointer;">Contacts</div>
-      <div style="font-size: 13px; margin-bottom: 12px; cursor: pointer;">Settings</div>
-    </div>
-    <div class="content">
-      <h1 class="header">Bulk Tagging</h1>
-      <p class="subheader">Bulk apply tags to multiple contacts</p>
-      <div class="toolbar">
-        <button class="btn">+ Add Tag</button>
-        <button class="btn-secondary">Export</button>
+  <div class="topbar-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Search Caruso</span></div>
+  <button class="topbar-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 16v-4M12 8h.01"/></svg>Agent</button>
+  <button class="topbar-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create</button>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-account"><div class="topbar-tenant">Ventura</div><div class="topbar-divider"></div><div class="avatar">BP</div></div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content"></main>
+</div>
+
+<div class="page-switch-label" id="toast"></div>
+<div class="undo-toast" id="undoToast">
+  <span class="undo-toast-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9L9.5 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="undo-toast-msg" id="undoToastMsg"></span>
+  <button class="undo-toast-btn" onclick="undoTagChange()">Undo</button>
+</div>
+
+<script>
+// ─── TAG STYLES (badge colours) ────────────────────
+const tagStyles = {
+  'Wholesale':           { bg:'#ede9fd', text:'#7f6df1' },
+  'Retail':              { bg:'#fef3e8', text:'#c07514' },
+  'Sophisticated':       { bg:'#f0e8fd', text:'#7c3aed' },
+  'High Net Worth':      { bg:'#e7f5ee', text:'#2e7d57' },
+  'Adviser-Introduced':  { bg:'#e3f0fb', text:'#1a6ea8' },
+  'PEP':                 { bg:'#fde8e8', text:'#b91c1c' },
+  'KYC Complete':        { bg:'#e0f5f0', text:'#0f766e' },
+  'Under Review':        { bg:'#fef3e8', text:'#b45309' },
+  'Tax Exempt':          { bg:'#eee8fd', text:'#6d28d9' },
+  'DRP Enrolled':        { bg:'#fce8f3', text:'#be185d' },
+  'SMSF':                { bg:'#eef0f3', text:'#4b5563' },
+  'Foreign Entity':      { bg:'#fde8e8', text:'#b91c1c' },
+  'Frozen':              { bg:'#fde8e8', text:'#b91c1c' }
+};
+
+// Separate tag lists per entity type
+const ACCT_TAGS = ['Wholesale','Retail','Sophisticated','High Net Worth','Adviser-Introduced','PEP','KYC Complete','Under Review'];
+const IE_TAGS   = ['Wholesale','Retail','Tax Exempt','DRP Enrolled','SMSF','Foreign Entity','Under Review','Frozen'];
+const getTags = () => currentPage === 'acct' ? ACCT_TAGS : IE_TAGS;
+// Named colour options matching Figma design
+const NAMED_COLOURS = [
+  { name:'Grey',   bg:'#eef0f3', text:'#4b5563' },
+  { name:'Purple', bg:'#ede9fd', text:'#7f6df1' },
+  { name:'Blue',   bg:'#e3f0fb', text:'#1a6ea8' },
+  { name:'Green',  bg:'#e7f5ee', text:'#2e7d57' },
+  { name:'Yellow', bg:'#fef3e8', text:'#c07514' },
+  { name:'Orange', bg:'#fce8f3', text:'#be185d' },
+  { name:'Pink',   bg:'#f0e8fd', text:'#7c3aed' },
+  { name:'Red',    bg:'#fde8e8', text:'#b91c1c' }
+];
+
+// ─── DATA ──────────────────────────────────────────
+const ACCTS = [
+  {id:1314,d:'10 Mar 2026',n:'Timmy Guidi',t:'ACCOUNT',tk:1,e:'victor.guidi+timmy@getc...',p:'+64 1212312345',co:'New Zealand',ie:'-',sel:false, tags:['Wholesale','KYC Complete']},
+  {id:1341,d:'10 Mar 2026',n:'bobby fedian',t:'PROSPECT',tk:0,e:'bobby.ferdian+1242@getc...',p:'+64 21721320',co:'-',ie:'-',sel:false, tags:['Under Review']},
+  {id:1340,d:'10 Mar 2026',n:'Kimi Guidi',t:'PROSPECT',tk:0,e:'victor.guidi+kimi@getca...',p:'+64 1213412345',co:'New Zealand',ie:'-',sel:false, tags:['High Net Worth','KYC Complete']},
+  {id:1313,d:'10 Mar 2026',n:'Jimmy Guidi',t:'ACCOUNT',tk:1,e:'victor.guidi+jimmy@getc...',p:'+64 2002012345',co:'New Zealand',ie:'-',sel:false, tags:['Wholesale','Adviser-Introduced']},
+  {id:1312,d:'10 Mar 2026',n:'Lu Luy',t:'ACCOUNT',tk:2,e:'jenny.lee+lulu@getcaruso...',p:'+1 2111111111',co:'Australia',ie:'-',sel:false, tags:['Retail']},
+  {id:1311,d:'10 Mar 2026',n:'Bobby Ferdian',t:'ACCOUNT',tk:1,e:'bobby.ferdian+567@getc...',p:'+64 21721320',co:'New Zealand',ie:'-',sel:false, tags:['Retail','KYC Complete']},
+  {id:1338,d:'10 Mar 2026',n:'j k',t:'PROSPECT',tk:0,e:'jenn.lee+pjl@getcaruso.com',p:'+64 2111111111',co:'-',ie:'-',sel:false, tags:[]},
+  {id:1310,d:'09 Mar 2026',n:'Test Linked Account',t:'ACCOUNT',tk:2,e:'dream.j+testlinked@getc...',p:'+1 12342134',co:'New Zealand',ie:'-',sel:false, tags:['Sophisticated','PEP','KYC Complete']},
+  {id:1336,d:'09 Mar 2026',n:'Already Linked A...',t:'PROSPECT',tk:0,e:'dream.j+testlinked@getc...',p:'+64 143241234',co:'-',ie:'-',sel:false, tags:[]},
+  {id:1309,d:'06 Mar 2026',n:'Jenny Cookie Test 2',t:'ACCOUNT',tk:2,e:'jenny.lee+cookietest2@g...',p:'+1 11111111111',co:'Australia',ie:'-',sel:false, tags:['Wholesale','High Net Worth','PEP']},
+  {id:1335,d:'05 Mar 2026',n:'Test Test',t:'PROSPECT',tk:0,e:'brad.rautenbach+12@getc...',p:'-',co:'New Zealand',ie:'-',sel:false, tags:[]},
+];
+
+const IES = [
+  {id:1264,d:'05 Mar 2026',n:'Matthe Boote Boote',t:'INDIVIDUAL',tk:5,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Wholesale','DRP Enrolled','Tax Exempt','Foreign Entity','SMSF','Frozen','Under Review']},
+  {id:1263,d:'05 Mar 2026',n:'sdfg',t:'COMPANY',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:[]},
+  {id:1262,d:'05 Mar 2026',n:'sdfg',t:'COMPANY',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Tax Exempt','Wholesale','Retail','DRP Enrolled','SMSF']},
+  {id:1261,d:'05 Mar 2026',n:'sdfg',t:'COMPANY',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Foreign Entity']},
+  {id:1260,d:'05 Mar 2026',n:'PArtineshipKarina',t:'PARTNERSHIP',tk:2,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Wholesale','Tax Exempt','Retail','Frozen','DRP Enrolled','Under Review']},
+  {id:1259,d:'05 Mar 2026',n:'KarinaCompany',t:'COMPANY',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Retail']},
+  {id:1258,d:'05 Mar 2026',n:'JointIndividualKarina',t:'JOINT-INDIVIDUAL',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Retail','DRP Enrolled']},
+  {id:1257,d:'05 Mar 2026',n:'Karina Trust',t:'TRUST',tk:4,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['SMSF']},
+  {id:1256,d:'05 Mar 2026',n:'Karina Guidi',t:'INDIVIDUAL',tk:1,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Karina Guidi',h:0,sel:false, tags:['Wholesale']},
+  {id:1255,d:'04 Mar 2026',n:'PEMonte Fadel',t:'INDIVIDUAL',tk:2,cc:'NZD 0.00',pv:'NZD 0.00',ka:'Pejim Spencer',h:0,sel:false, tags:['Under Review','Frozen']},
+  {id:1253,d:'01 Mar 2026',n:'PEWestley Schuster',t:'INDIVIDUAL',tk:1,cc:'NZD 2,312,321.00',pv:'NZD 2,983.72',ka:'Pemalachi Kohler',h:1,sel:false, tags:['Wholesale','DRP Enrolled']},
+];
+
+// ─── STATE ─────────────────────────────────────────
+let currentPage = 'acct'; // 'acct', 'ie', or 'detail'
+let actionsOpen = false;
+let tagPickerOpen = false;
+let tpSearch = '';
+let tpScreen = 'list'; // 'list' or 'colour' — which screen the picker shows
+let createName = '';
+let justCreatedTag = null; // tag name that was just created (for "Created & added" label)
+let inlinePopoverRow = null; // index of row whose +N is open
+let undoSnapshot = null; // {page, tagsBefore: Map<rowIdx, [...tags]>, msg}
+let undoToastTimer = null;
+let changeCount = 0; // number of tag changes made while picker is open
+let detailTagPickerOpen = false; // tag picker on detail page
+let detailContact = null; // the contact being viewed on detail page
+
+// ─── HELPERS ───────────────────────────────────────
+const getData = () => (currentPage === 'acct' || currentPage === 'detail') ? ACCTS : IES;
+const selCount = () => getData().filter(r => r.sel).length;
+const entLabel = () => currentPage === 'acct' ? 'contacts' : 'investing entities';
+const bc = t => ({ACCOUNT:'badge-account',PROSPECT:'badge-prospect',INDIVIDUAL:'badge-individual',COMPANY:'badge-company',TRUST:'badge-trust',PARTNERSHIP:'badge-partnership','JOINT-INDIVIDUAL':'badge-joint'}[t]||'badge-account');
+const sparkle = () => '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C8 0 8.44324 4.11646 10.1592 5.84082C11.8751 7.55675 16 8 16 8C16 8 11.8835 8.44324 10.1592 10.1592C8.44325 11.8751 8 16 8 16C8 16 7.55676 11.8835 5.84082 10.1592C4.12489 8.44325 0 8 0 8C0 8 4.11646 7.55676 5.84082 5.84082C7.55675 4.12489 8 0 8 0Z" fill="#949AB0"/></svg>';
+const searchIcon = () => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aab2bd" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+const chevDown = () => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+function getTagStyle(name) {
+  return tagStyles[name] || { bg:'#eef0f3', text:'#4b5563' };
+}
+
+function renderTagBadge(name, height) {
+  const s = getTagStyle(name);
+  const h = height || 24;
+  return `<span class="tag" style="background:${s.bg}; color:${s.text}; height:${h}px">${escHtml(name)}</span>`;
+}
+
+// Render tags in table cells — Option F: 2 visible + clickable +N
+function renderTagCell(tags, rowIdx) {
+  if (!tags || tags.length === 0) return '<span style="color:#8c95a6">-</span>';
+  const maxVisible = 2;
+  const visible = tags.slice(0, maxVisible);
+  const extra = tags.length - maxVisible;
+  let html = '<div class="tag-wrap">';
+  html += visible.map(t => renderTagBadge(t)).join('');
+  if (extra > 0) {
+    html += `<span class="tag-counter" onclick="event.stopPropagation(); toggleInlinePopover(${rowIdx})">+${extra}</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// Get tag states across selected rows: 'all', 'some', or 'none'
+function getTagStates() {
+  const data = getData();
+  const selected = data.filter(r => r.sel);
+  if (selected.length === 0) return {};
+  const states = {};
+  getTags().forEach(tag => {
+    const count = selected.filter(r => r.tags.includes(tag)).length;
+    if (count === 0) states[tag] = 'none';
+    else if (count === selected.length) states[tag] = 'all';
+    else states[tag] = 'some';
+  });
+  return states;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── SIDEBAR ───────────────────────────────────────
+function renderSidebar() {
+  const active = currentPage === 'detail' ? 'Accounts' : (currentPage === 'acct' ? 'Accounts' : 'Investing Entities');
+  const ch = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d2cbff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  const secs = [
+    {l:'CRM', items:['Tasks','Investing Entities','Accounts','Related Parties','Communications','Activity']},
+    {l:'Registry', items:['Funds','Classes','Capital Raises','Orders']},
+    {l:'Finance', items:[{n:'Deposits',b:'15'},'Transactions','Distributions']},
+    {l:'Data & Reporting', items:['Reports','Statements','Audit Log','File Converter','Imports']},
+    {l:'Settings', items:['Teammates','Configuration']}
+  ];
+  let h = '';
+  secs.forEach((s, i) => {
+    h += `<div class="nav-section-label"${i > 0 ? ' style="margin-top:8px"' : ''}><span>${s.l}</span>${ch}</div>`;
+    s.items.forEach(it => {
+      const nm = typeof it === 'string' ? it : it.n;
+      const bd = typeof it === 'object' && it.b ? `<span class="nav-badge">${it.b}</span>` : '';
+      const isClickable = (nm === 'Accounts' || nm === 'Investing Entities');
+      h += `<div class="nav-item${nm === active ? ' active' : ''}" ${isClickable ? `onclick="switchPage('${nm === 'Accounts' ? 'acct' : 'ie'}')"` : ''}>${nm}${bd}</div>`;
+    });
+  });
+  document.getElementById('sidebar').innerHTML = h;
+}
+
+// ─── SWITCH PAGE ───────────────────────────────────
+function switchPage(page) {
+  if (page === currentPage && currentPage !== 'detail') return;
+  detailContact = null;
+  detailTagPickerOpen = false;
+  currentPage = page;
+  closeAll();
+  getData().forEach(r => r.sel = false);
+  renderAll();
+}
+
+// ─── CLOSE ALL POPOVERS ───────────────────────────
+function closeAll() {
+  actionsOpen = false;
+  tagPickerOpen = false;
+  detailTagPickerOpen = false;
+  tpSearch = '';
+  tpScreen = 'list';
+  inlinePopoverRow = null;
+  justCreatedTag = null;
+}
+
+// ─── RENDER MAIN ───────────────────────────────────
+function renderMain() {
+  const isA = currentPage === 'acct';
+  const data = getData();
+  const sc = selCount();
+  const pageLabel = isA ? 'Accounts' : 'Investing Entities';
+
+  // Headers
+  const headers = isA
+    ? '<th class="col-check"><input type="checkbox" id="selectAll" onchange="toggleAll(this.checked)"></th><th class="col-id">ID</th><th>Date Added</th><th>Name</th><th>Type</th><th>No. Tasks</th><th>Email</th><th>Phone</th><th>Country</th><th>No. IE</th><th>Tags</th><th>ID Verification</th><th style="width:48px"></th>'
+    : '<th class="col-check"><input type="checkbox" id="selectAll" onchange="toggleAll(this.checked)"></th><th class="col-id">ID</th><th>Date Added</th><th>Investing Entity</th><th>Type</th><th>No. Tasks</th><th>Capital Contributed</th><th>Portfolio Value</th><th>Key Account</th><th>No. Holdings</th><th>Tags</th><th>Risk Profile</th><th style="width:48px"></th>';
+
+  let rows = '';
+  data.forEach((r, i) => {
+    const sel = r.sel ? ' selected' : '';
+    const chk = r.sel ? ' checked' : '';
+    if (isA) {
+      rows += `<tr class="${sel}" onclick="onRowClick(${i}, event)"><td class="col-check"><input type="checkbox"${chk} onclick="event.stopPropagation(); toggleRow(${i})"></td><td class="col-id">${r.id}</td><td>${r.d}</td><td>${r.n}</td><td><span class="badge ${bc(r.t)}">${r.t}</span></td><td><button class="tasks-btn" onclick="event.stopPropagation()">View <span class="task-count">${r.tk}</span></button></td><td style="color:#8c95a6">${r.e}</td><td>${r.p}</td><td>${r.co}</td><td>${r.ie}</td><td style="position:relative">${renderTagCell(r.tags, i)}</td><td style="color:#8c95a6">-</td><td class="add-cell"><button class="add-btn" onclick="event.stopPropagation()">${sparkle()}</button></td></tr>`;
+    } else {
+      rows += `<tr class="${sel}" onclick="onRowClick(${i}, event)"><td class="col-check"><input type="checkbox"${chk} onclick="event.stopPropagation(); toggleRow(${i})"></td><td class="col-id">${r.id}</td><td>${r.d}</td><td>${r.n}</td><td><span class="badge ${bc(r.t)}">${r.t}</span></td><td><button class="tasks-btn" onclick="event.stopPropagation()">View <span class="task-count">${r.tk}</span></button></td><td>${r.cc}</td><td>${r.pv}</td><td>${r.ka}</td><td><button class="tasks-btn" onclick="event.stopPropagation()">View <span class="task-count">${r.h}</span></button></td><td style="position:relative">${renderTagCell(r.tags, i)}</td><td style="color:#8c95a6">-</td><td class="add-cell"><button class="add-btn" onclick="event.stopPropagation()">${sparkle()}</button></td></tr>`;
+    }
+  });
+
+  const toolbar = isA
+    ? `<button class="filter-btn">Status</button><button class="filter-btn">Tags</button><div class="toolbar-spacer"></div><button class="create-btn">+ Create contact</button>`
+    : `<button class="filter-btn">Type</button><button class="filter-btn">Risk profile</button><button class="filter-btn">Tags</button><div class="toolbar-spacer"></div>`;
+
+  let html = `
+    <div class="page-header"><nav class="breadcrumb"><span>CRM</span><span>›</span><span class="current">${pageLabel}</span></nav></div>
+    <div class="toolbar"><div class="search-box">${searchIcon()}<input type="text" placeholder="Search"></div>${toolbar}</div>
+    <div class="table-wrap"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="pagination"><span class="results-label">Showing 1–${data.length} of ${isA ? 42 : 64}</span></div>
+    <div class="action-bar${sc === 0 ? ' hidden' : ''}" id="actionBar">
+      <span class="action-bar-count">${sc} selected</span>
+      <button class="action-bar-btn" onclick="clearSelection()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9 3L3 9M3 3l6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg> Clear all</button>
+      <button class="action-bar-btn" onclick="selectAll()">Select all (${data.length})</button>
+      <div class="action-bar-divider"></div>
+      <div class="actions-dropdown-anchor">
+        <button class="action-bar-btn primary" onclick="toggleActions(event)">Actions ${chevDown()}</button>
+        ${actionsOpen ? renderActionsDropdown() : ''}
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Tags</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Alice Johnson</td>
-            <td>alice@example.com</td>
-            <td><span class="tag investor">Investor</span></td>
-          </tr>
-          <tr>
-            <td>Bob Smith</td>
-            <td>bob@example.com</td>
-            <td><span class="tag prospect">Prospect</span></td>
-          </tr>
-        </tbody>
-      </table>
+    </div>`;
+
+  // Tag picker overlay
+  if (tagPickerOpen) {
+    html += `<div class="tag-picker-backdrop" onclick="closeTagPicker()"></div>`;
+    html += `<div class="tag-picker-anchor">${renderTagPicker('bulk')}</div>`;
+  }
+
+  document.getElementById('main-content').innerHTML = html;
+
+  // Sync select-all checkbox
+  const sa = document.getElementById('selectAll');
+  if (sa) {
+    const allSel = data.every(r => r.sel);
+    const someSel = data.some(r => r.sel);
+    sa.checked = allSel;
+    sa.indeterminate = someSel && !allSel;
+  }
+
+  // Focus search if picker open
+  if (tagPickerOpen) {
+    setTimeout(() => { const inp = document.getElementById('tpSearchInput'); if (inp) inp.focus(); }, 30);
+  }
+}
+
+// ─── ACTIONS DROPDOWN ──────────────────────────────
+function renderActionsDropdown() {
+  const tagSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#474d66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+  return `<div class="actions-dropdown">
+    <div class="actions-dropdown-item" onclick="openTagPicker(event)">${tagSvg} Change or add tags</div>
+  </div>`;
+}
+
+// ─── TAG PICKER ────────────────────────────────────
+function renderTagPicker(context) {
+  // context: 'bulk' (default) or 'detail'
+  const isBulk = context !== 'detail';
+  const sc = isBulk ? selCount() : 0;
+
+  // Colour selection screen (Step 2)
+  if (tpScreen === 'colour') {
+    const colourItems = NAMED_COLOURS.map(c => {
+      const s = { bg: c.bg, text: c.text };
+      return `<div class="tp-colour-item" onclick="confirmCreate('${c.name}')">
+        <span class="tp-tag-badge" style="background:${s.bg}; color:${s.text}">${escHtml(createName)}</span>
+      </div>`;
+    }).join('');
+    return `<div class="tag-picker tp-colour-screen">
+      <div class="tp-colour-header">
+        <button class="tp-colour-back" onclick="tpScreen='list'; renderAll();">‹</button>
+        <span class="tp-colour-title">New "${escHtml(createName)}" tag</span>
+      </div>
+      <div class="tp-colour-subtitle">Select a colour...</div>
+      <div class="tp-colour-list">${colourItems}</div>
+    </div>`;
+  }
+
+  // Main tag list screen
+  const states = isBulk ? getTagStates() : {};
+  const query = tpSearch.toLowerCase();
+  const allTags = isBulk ? getTags() : ACCT_TAGS; // detail page always uses account tags
+  const filtered = allTags.filter(t => t.toLowerCase().includes(query));
+  const showCreateOption = query.length > 0 && !allTags.find(t => t.toLowerCase() === query);
+
+  // Sort: checked tags alphabetically at top, unchecked alphabetically below
+  // Exception: justCreatedTag goes to very top
+  const sortedTags = [...filtered].sort((a, b) => {
+    if (isBulk) {
+      const stA = states[a] || 'none';
+      const stB = states[b] || 'none';
+      const checkedA = stA === 'all' || stA === 'some';
+      const checkedB = stB === 'all' || stB === 'some';
+      if (a === justCreatedTag) return -1;
+      if (b === justCreatedTag) return 1;
+      if (checkedA && !checkedB) return -1;
+      if (!checkedA && checkedB) return 1;
+    } else {
+      // Detail: contact tags
+      const hasA = detailContact && detailContact.tags.includes(a);
+      const hasB = detailContact && detailContact.tags.includes(b);
+      if (a === justCreatedTag) return -1;
+      if (b === justCreatedTag) return 1;
+      if (hasA && !hasB) return -1;
+      if (!hasA && hasB) return 1;
+    }
+    return a.localeCompare(b);
+  });
+
+  let items = '';
+  sortedTags.forEach(tag => {
+    let checkCls = '';
+    if (isBulk) {
+      const state = states[tag] || 'none';
+      checkCls = state === 'all' ? 'on' : state === 'some' ? 'mixed' : '';
+    } else {
+      const has = detailContact && detailContact.tags.includes(tag);
+      checkCls = has ? 'on' : '';
+    }
+    const s = getTagStyle(tag);
+    const createdLabel = tag === justCreatedTag ? '<span class="tp-created-label">Created &amp; added</span>' : '';
+    const safeName = tag.replace(/'/g,"&#39;");
+    const onclickFn = isBulk ? `toggleTag('${safeName}')` : `toggleDetailTag('${safeName}')`;
+    items += `<div class="tp-item" onclick="${onclickFn}">
+      <div class="tp-check ${checkCls}"></div>
+      <span class="tp-tag-badge" style="background:${s.bg}; color:${s.text}">${escHtml(tag)}</span>
+      ${createdLabel}
+    </div>`;
+  });
+
+  const createRow = showCreateOption
+    ? `<div class="tp-create" onclick="startCreate()"><span class="tp-create-icon">+</span> Create "${escHtml(tpSearch)}" tag</div>`
+    : '';
+
+  return `<div class="tag-picker">
+    <div class="tp-header">
+      <span class="tp-header-title">Tags</span>
     </div>
-  </div>
+    <div class="tp-search">${searchIcon()}<input type="text" id="tpSearchInput" placeholder="Search or create tag..." value="${escHtml(tpSearch)}" oninput="tpSearch=this.value; updatePickerList('${context || 'bulk'}');"></div>
+    <div class="tp-list">${items.length > 0 ? items : (showCreateOption ? '' : '<div style="padding:12px;color:#8c95a6;font-size:13px;text-align:center">No tags found</div>')}</div>
+    ${createRow}
+  </div>`;
+}
+
+// ─── UPDATE PICKER LIST (without destroying the input) ──
+function updatePickerList(context) {
+  justCreatedTag = null; // clear "Created & added" when user searches
+  // Re-render picker content area only
+  const pickerEl = document.querySelector('.tag-picker');
+  if (!pickerEl) return;
+  // Easiest: re-render picker entirely but keep search focus
+  const searchVal = tpSearch;
+  const anchor = pickerEl.parentNode;
+  if (anchor) {
+    anchor.innerHTML = renderTagPicker(context);
+    const inp = document.getElementById('tpSearchInput');
+    if (inp) { inp.focus(); inp.value = searchVal; inp.setSelectionRange(searchVal.length, searchVal.length); }
+  }
+}
+
+// ─── ROW ACTIONS ───────────────────────────────────
+function onRowClick(idx, event) {
+  // Ignore clicks on buttons, tag counters, or the checkbox cell
+  if (event.target.tagName === 'BUTTON' || event.target.closest('button') || event.target.classList.contains('tag-counter')) return;
+  if (event.target.tagName === 'INPUT' || event.target.closest('.col-check')) return;
+  // Navigate to detail page
+  if (currentPage === 'acct') {
+    openDetail(idx);
+  }
+}
+function toggleRow(idx) {
+  const data = getData();
+  data[idx].sel = !data[idx].sel;
+  if (selCount() === 0) closeAll();
+  renderMain();
+}
+
+function toggleAll(checked) {
+  getData().forEach(r => r.sel = checked);
+  if (!checked) closeAll();
+  renderMain();
+}
+
+function clearSelection() {
+  getData().forEach(r => r.sel = false);
+  closeAll();
+  renderMain();
+}
+function selectAll() {
+  getData().forEach(r => r.sel = true);
+  renderMain();
+}
+
+// ─── ACTIONS DROPDOWN ──────────────────────────────
+function toggleActions(e) {
+  e.stopPropagation();
+  if (tagPickerOpen) return; // don't toggle if picker is open
+  actionsOpen = !actionsOpen;
+  renderMain();
+}
+
+// ─── TAG PICKER ACTIONS ────────────────────────────
+function openTagPicker(e) {
+  e.stopPropagation();
+  actionsOpen = false;
+  tagPickerOpen = true;
+  tpSearch = '';
+  tpScreen = 'list';
+  justCreatedTag = null;
+  changeCount = 0;
+
+  // Snapshot current tags for undo
+  const data = getData();
+  const tagsBefore = new Map();
+  data.forEach((r, i) => { if (r.sel) tagsBefore.set(i, [...r.tags]); });
+  undoSnapshot = { page: currentPage, tagsBefore };
+
+  renderMain();
+}
+
+function closeTagPicker() {
+  tagPickerOpen = false;
+  tpSearch = '';
+  tpScreen = 'list';
+  justCreatedTag = null;
+  renderMain();
+
+  // Show undo toast if changes were made
+  if (changeCount > 0 && undoSnapshot) {
+    const sc = undoSnapshot.tagsBefore.size;
+    const label = currentPage === 'acct'
+      ? (sc === 1 ? 'contact' : 'contacts')
+      : (sc === 1 ? 'entity' : 'entities');
+    showUndoToast(`Successfully updated tags on ${sc} ${label}.`);
+  }
+}
+
+function toggleTag(tagName) {
+  const data = getData();
+  const selected = data.filter(r => r.sel);
+  if (selected.length === 0) return;
+
+  // Determine current state
+  const count = selected.filter(r => r.tags.includes(tagName)).length;
+  const state = count === 0 ? 'none' : count === selected.length ? 'all' : 'some';
+
+  // Toggle logic:
+  // none → add to all (check)
+  // some → add to all (check — complete the partial)
+  // all → remove from all (uncheck)
+  if (state === 'all') {
+    selected.forEach(r => { r.tags = r.tags.filter(t => t !== tagName); });
+  } else {
+    selected.forEach(r => { if (!r.tags.includes(tagName)) r.tags.push(tagName); });
+  }
+
+  changeCount++;
+  renderMain();
+}
+
+// ─── TAG CREATION (2-step: type name → pick colour) ──
+function startCreate() {
+  createName = tpSearch;
+  tpScreen = 'colour'; // navigate to colour selection screen
+  renderAll();
+}
+
+function confirmCreate(colourName) {
+  if (!createName.trim()) return;
+  const name = createName.trim();
+  const colour = NAMED_COLOURS.find(c => c.name === colourName) || NAMED_COLOURS[0];
+  tagStyles[name] = { bg: colour.bg, text: colour.text };
+
+  // Add to appropriate tag list
+  if (currentPage === 'detail' || currentPage === 'acct') {
+    ACCT_TAGS.push(name);
+  } else {
+    IE_TAGS.push(name);
+  }
+
+  // Auto-add to selected rows (bulk) or contact (detail)
+  if (currentPage === 'detail' && detailContact) {
+    if (!detailContact.tags.includes(name)) detailContact.tags.push(name);
+  } else {
+    const data = getData();
+    data.filter(r => r.sel).forEach(r => {
+      if (!r.tags.includes(name)) r.tags.push(name);
+    });
+  }
+
+  justCreatedTag = name;
+  tpScreen = 'list';
+  tpSearch = '';
+  changeCount++;
+  renderAll();
+}
+
+// ─── INLINE POPOVER (for +N in table) ──────────────
+function toggleInlinePopover(rowIdx) {
+  inlinePopoverRow = inlinePopoverRow === rowIdx ? null : rowIdx;
+  renderMain();
+
+  if (inlinePopoverRow !== null) {
+    // Position the popover near the +N counter
+    setTimeout(() => {
+      const counter = document.querySelector(`tr:nth-child(${rowIdx + 1}) .tag-counter`);
+      const popover = document.getElementById('inlineTagPop');
+      if (counter && popover) {
+        const rect = counter.getBoundingClientRect();
+        const main = document.querySelector('.main').getBoundingClientRect();
+        popover.style.left = (rect.left - main.left - 8) + 'px';
+        popover.style.top = (rect.bottom - main.top + 4) + 'px';
+      }
+    }, 10);
+  }
+}
+
+// Add inline popover to the page after main render
+const origRenderMain = renderMain;
+renderMain = function() {
+  origRenderMain();
+
+  // Add inline tag popover if open
+  if (inlinePopoverRow !== null) {
+    const data = getData();
+    const row = data[inlinePopoverRow];
+    if (row && row.tags.length > 0) {
+      const pop = document.createElement('div');
+      pop.id = 'inlineTagPop';
+      pop.className = 'tag-popover-inline';
+      pop.style.position = 'absolute';
+      pop.style.zIndex = '80';
+      pop.innerHTML = row.tags.map(t => renderTagBadge(t)).join('');
+      document.querySelector('.main').appendChild(pop);
+
+      // Close on outside click
+      const closer = (e) => {
+        if (!pop.contains(e.target) && !e.target.classList.contains('tag-counter')) {
+          inlinePopoverRow = null;
+          pop.remove();
+          document.removeEventListener('click', closer);
+          // Don't re-render, just remove
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closer), 10);
+    }
+  }
+};
+
+// Close actions dropdown on outside click
+document.addEventListener('click', (e) => {
+  if (actionsOpen && !e.target.closest('.actions-dropdown-anchor')) {
+    actionsOpen = false;
+    renderMain();
+  }
+});
+
+// ─── TOAST ─────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ─── UNDO TOAST ───────────────────────────────────
+function showUndoToast(msg) {
+  dismissUndoToast(); // clear any existing
+  const el = document.getElementById('undoToast');
+  document.getElementById('undoToastMsg').textContent = msg;
+  el.classList.add('show');
+  undoToastTimer = setTimeout(() => {
+    dismissUndoToast();
+    undoSnapshot = null; // can't undo after timeout
+  }, 6000);
+}
+
+function dismissUndoToast() {
+  if (undoToastTimer) { clearTimeout(undoToastTimer); undoToastTimer = null; }
+  document.getElementById('undoToast').classList.remove('show');
+}
+
+function undoTagChange() {
+  if (!undoSnapshot) return;
+  const data = undoSnapshot.page === 'acct' ? ACCTS : IES;
+  undoSnapshot.tagsBefore.forEach((tags, idx) => {
+    if (data[idx]) data[idx].tags = [...tags];
+  });
+  dismissUndoToast();
+  undoSnapshot = null;
+  changeCount = 0;
+  renderMain();
+  showToast('Changes undone');
+}
+
+// ─── DETAIL PAGE ────────────────────────────────────
+function openDetail(idx) {
+  const data = getData();
+  detailContact = data[idx];
+  currentPage = 'detail';
+  closeAll();
+  renderAll();
+}
+
+function closeDetail() {
+  currentPage = 'acct';
+  detailContact = null;
+  detailTagPickerOpen = false;
+  closeAll();
+  renderAll();
+}
+
+function toggleDetailTagPicker(e) {
+  e.stopPropagation();
+  detailTagPickerOpen = !detailTagPickerOpen;
+  tpSearch = '';
+  tpScreen = 'list';
+  justCreatedTag = null;
+  renderAll();
+}
+
+function closeDetailTagPicker() {
+  detailTagPickerOpen = false;
+  tpSearch = '';
+  tpScreen = 'list';
+  justCreatedTag = null;
+  renderAll();
+}
+
+function toggleDetailTag(tagName) {
+  if (!detailContact) return;
+  const idx = detailContact.tags.indexOf(tagName);
+  if (idx >= 0) {
+    detailContact.tags.splice(idx, 1);
+  } else {
+    detailContact.tags.push(tagName);
+  }
+  changeCount++;
+  renderAll();
+}
+
+function renderDetail() {
+  if (!detailContact) return;
+  const c = detailContact;
+  const initials = (c.n || '').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+  // Tags display in header — click anywhere in tags area to open picker
+  let tagsHtml = '';
+  if (c.tags.length === 0) {
+    tagsHtml = `<span class="add-tag-link" onclick="toggleDetailTagPicker(event)">Add tag</span>`;
+  } else {
+    const maxVisible = 2;
+    const visible = c.tags.slice(0, maxVisible);
+    const extra = c.tags.length - maxVisible;
+    let badgesHtml = visible.map(t => renderTagBadge(t, 24)).join(' ');
+    if (extra > 0) {
+      badgesHtml += ` <span class="tag-counter">+${extra}</span>`;
+    }
+    tagsHtml = `<span onclick="toggleDetailTagPicker(event)" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px;">${badgesHtml}</span>`;
+  }
+
+  const tagPickerHtml = detailTagPickerOpen
+    ? `<div class="detail-tag-picker-anchor">${renderTagPicker('detail')}</div>`
+    : '';
+
+  let html = `
+    <div class="page-header"><nav class="breadcrumb"><span style="cursor:pointer" onclick="closeDetail()">Contacts</span><span>›</span><span class="current">${escHtml(c.n)}</span></nav></div>
+    <div class="detail-header">
+      <div class="detail-identity">
+        <div class="detail-avatar">${initials}</div>
+        <div>
+          <div class="detail-name">${escHtml(c.n)}</div>
+          <div class="detail-id">ID: ${c.id}</div>
+        </div>
+        <div class="detail-actions">
+          <button class="detail-action-btn plus">+</button>
+          <button class="detail-action-btn">Create task</button>
+          <button class="detail-action-btn">Add note</button>
+          <button class="detail-action-btn">Add document</button>
+          <button class="detail-action-btn">Send email</button>
+          <button class="detail-action-btn">Impersonate</button>
+          <button class="detail-action-btn" style="padding:0 8px;">···</button>
+        </div>
+      </div>
+      <div class="detail-fields">
+        <div class="detail-field">
+          <div class="detail-field-label">No. Tasks</div>
+          <div class="detail-field-value"><button class="tasks-btn">View <span class="task-count">${c.tk}</span></button></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Role</div>
+          <div class="detail-field-value">-</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Email</div>
+          <div class="detail-field-value">${escHtml(c.e)}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Phone</div>
+          <div class="detail-field-value">${c.p}</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Linked Related Party</div>
+          <div class="detail-field-value"><a href="#">Add link</a></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Portal Login</div>
+          <div class="detail-field-value"><span class="portal-badge">NO</span></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">No. Investing Entities</div>
+          <div class="detail-field-value"><button class="tasks-btn">View <span class="task-count">0</span></button></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Cons. Portfolio Value</div>
+          <div class="detail-field-value">AUD 0.00</div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">No. Connections</div>
+          <div class="detail-field-value"><button class="tasks-btn">View <span class="task-count">0</span></button></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Tags</div>
+          <div class="detail-field-value detail-tag-picker-wrap">
+            ${tagsHtml}
+            ${tagPickerHtml}
+          </div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Account Manager</div>
+          <div class="detail-field-value"><button class="detail-action-btn" style="height:28px;font-size:12px;">Select ▾</button></div>
+        </div>
+        <div class="detail-field">
+          <div class="detail-field-label">Pinned Notes</div>
+          <div class="detail-field-value"><button class="tasks-btn">View <span class="task-count">0</span></button></div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-tabs">
+      <div class="detail-tab">Activity</div>
+      <div class="detail-tab">Tasks</div>
+      <div class="detail-tab">Document</div>
+      <div class="detail-tab">Notes</div>
+      <div class="detail-tab">Investing Entities</div>
+      <div class="detail-tab">Connections</div>
+      <div class="detail-tab">Security & Access</div>
+      <div class="detail-tab active">Adviser Details</div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-section-title">Details</div>
+      <div style="display:flex; gap:24px;">
+        <div style="width:300px; color:#8c95a6; font-size:13px;"></div>
+        <div style="flex:1;">
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">AFS Representative Number</div><input class="detail-form-input" value="18,691"></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Adviser Code</div><input class="detail-form-input" value="ADV 001"></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Adviser Company</div><select class="detail-form-select"><option>Please select</option></select></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Dealer Group</div><select class="detail-form-select"><option>Please select</option></select></div>
+          </div>
+          <button class="detail-save-btn">Save changes</button>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1px solid #e6e8f0; margin:24px 0;">
+
+      <div class="detail-section-title">Payment Details</div>
+      <div style="display:flex; gap:24px;">
+        <div style="width:300px; color:#8c95a6; font-size:13px;"></div>
+        <div style="flex:1;">
+          <div style="margin-bottom:16px;">
+            <div class="detail-form-label">Fees setting</div>
+            <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; border:1px solid #d8dae5; border-radius:6px; margin-top:4px;">
+              <span style="font-size:13px; color:#0a0a0a; flex:1;">Fees paid directly to adviser's nominated bank account below</span>
+              <div style="width:35px; height:20px; background:#7f6df1; border-radius:10px; position:relative; cursor:pointer;"><div style="width:16px; height:16px; background:#fff; border-radius:50%; position:absolute; top:2px; right:2px;"></div></div>
+            </div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Bank account country</div><select class="detail-form-select"><option>Australia</option></select></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Bank account name</div><input class="detail-form-input" value=""></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">BSB code</div><input class="detail-form-input" value=""></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Bank account number</div><input class="detail-form-input" value=""></div>
+          </div>
+          <div class="detail-form-row">
+            <div class="detail-form-group"><div class="detail-form-label">Swift/BIC</div><input class="detail-form-input" value=""></div>
+          </div>
+          <button class="detail-save-btn">Save changes</button>
+        </div>
+      </div>
+    </div>`;
+
+  // Backdrop for detail tag picker
+  if (detailTagPickerOpen) {
+    html = `<div class="tag-picker-backdrop" onclick="closeDetailTagPicker()" style="z-index:90;"></div>` + html;
+  }
+
+  document.getElementById('main-content').innerHTML = html;
+
+  // Focus search if picker open
+  if (detailTagPickerOpen) {
+    setTimeout(() => { const inp = document.getElementById('tpSearchInput'); if (inp) inp.focus(); }, 30);
+  }
+}
+
+// ─── RENDER ALL ────────────────────────────────────
+function renderAll() {
+  renderSidebar();
+  if (currentPage === 'detail') {
+    renderDetail();
+  } else {
+    renderMain();
+  }
+}
+
+// ─── INIT ──────────────────────────────────────────
+renderAll();
+</script>
 </body>
 </html>
